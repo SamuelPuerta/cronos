@@ -1,0 +1,8 @@
+# Development dependencies (unit tests only).
+# These are ONLY needed to run the test suite locally (pytest + moto
+# mock AWS, no real credentials required). They are not deployed to Lambda:
+# serverless-python-requirements packages only requirements.txt.
+-r requirements.txt
+
+pytest>=8.0.0
+moto[dynamodb]>=5.0.0

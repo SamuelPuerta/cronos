@@ -21,7 +21,12 @@ def validate_capsule_payload(data: dict) -> str | None:
         return '"ownerEmail" is required and must be a valid email'
 
     interval = data.get("checkInIntervalHours")
-    if not isinstance(interval, (int, float)) or interval < MIN_INTERVAL_HOURS:
+    # bool is a subclass of int in Python, so True would pass as 1; reject it explicitly
+    if (
+        isinstance(interval, bool)
+        or not isinstance(interval, (int, float))
+        or interval < MIN_INTERVAL_HOURS
+    ):
         return f'"checkInIntervalHours" must be a number >= {MIN_INTERVAL_HOURS}'
 
     return None

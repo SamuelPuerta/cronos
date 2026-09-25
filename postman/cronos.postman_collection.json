@@ -1,0 +1,201 @@
+{
+  "info": {
+    "_postman_id": "cronos-time-capsule-collection",
+    "name": "CRONOS — Digital Time Capsule",
+    "description": "Collection for the CRONOS serverless API (dead man's switch time capsule).\n\nSet the collection variable `base_url` to your deployed API URL (e.g. https://<api-id>.execute-api.us-east-1.amazonaws.com) or to http://localhost:3000 when running `serverless offline`.\n\nAfter creating a capsule, copy its `id` from the 201 response into the `capsule_id` collection variable to test get / update / delete / checkin against a real item.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "description": "Base URL of the API: deployed HTTP API URL or http://localhost:3000 for serverless offline"
+    },
+    {
+      "key": "capsule_id",
+      "value": "REPLACE-WITH-REAL-CAPSULE-ID",
+      "description": "Id of an existing capsule (copy it from the create response)"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create capsule (201)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"If you are reading this, I forgot to check in. Greetings from the past!\",\n  \"recipientEmail\": \"recipient@example.com\",\n  \"ownerEmail\": \"owner@example.com\",\n  \"checkInIntervalHours\": 24\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/capsules",
+          "host": ["{{base_url}}"],
+          "path": ["capsules"]
+        },
+        "description": "Creates a new ACTIVE time capsule. Expected: 201 with the created item. Copy the returned `id` into the `capsule_id` variable."
+      },
+      "response": []
+    },
+    {
+      "name": "Create capsule - invalid payload (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"recipientEmail\": \"recipient@example.com\",\n  \"ownerEmail\": \"owner@example.com\",\n  \"checkInIntervalHours\": 24\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/capsules",
+          "host": ["{{base_url}}"],
+          "path": ["capsules"]
+        },
+        "description": "Payload without \"message\". Expected: 400 with {\"error\": \"\\\"message\\\" is required and must be text\"}."
+      },
+      "response": []
+    },
+    {
+      "name": "List capsules (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/capsules?limit=10",
+          "host": ["{{base_url}}"],
+          "path": ["capsules"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Lists capsules using Scan with pagination. Query params: `limit` (default 20) and `lastKey` for the next page. Expected: 200 with {\"items\": [...], \"lastKey\": ...}."
+      },
+      "response": []
+    },
+    {
+      "name": "Get capsule by id (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/capsules/{{capsule_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["capsules", "{{capsule_id}}"]
+        },
+        "description": "Retrieves a single capsule. Expected: 200 with the item. Requires a real id in `capsule_id`."
+      },
+      "response": []
+    },
+    {
+      "name": "Get capsule - not found (404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/capsules/non-existent-id",
+          "host": ["{{base_url}}"],
+          "path": ["capsules", "non-existent-id"]
+        },
+        "description": "Requests an id that does not exist. Expected: 404 with {\"error\": \"Capsule not found\"}."
+      },
+      "response": []
+    },
+    {
+      "name": "Update capsule (200)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Updated message for the future\",\n  \"recipientEmail\": \"new-recipient@example.com\",\n  \"ownerEmail\": \"owner@example.com\",\n  \"checkInIntervalHours\": 48\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/capsules/{{capsule_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["capsules", "{{capsule_id}}"]
+        },
+        "description": "Updates message, recipientEmail and checkInIntervalHours of an ACTIVE capsule (ConditionExpression). Expected: 200 with the updated item; 404 if the id does not exist or is not ACTIVE."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete capsule (200)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/capsules/{{capsule_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["capsules", "{{capsule_id}}"]
+        },
+        "description": "Deletes a capsule (ConditionExpression attribute_exists). Expected: 200 with {\"message\": \"Capsule deleted successfully\"}; 404 if the id does not exist."
+      },
+      "response": []
+    },
+    {
+      "name": "Check-in (200)",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/capsules/{{capsule_id}}/checkin",
+          "host": ["{{base_url}}"],
+          "path": ["capsules", "{{capsule_id}}", "checkin"]
+        },
+        "description": "Registers activity for an ACTIVE capsule: resets lastCheckIn to now and nextReview to now + checkInIntervalHours. Expected: 200 with {\"message\": \"Check-in registered\", \"nextReview\": \"...\"}; 404 if not found or not ACTIVE."
+      },
+      "response": []
+    },
+    {
+      "name": "Search capsules by status (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/capsules/search?status=ACTIVE",
+          "host": ["{{base_url}}"],
+          "path": ["capsules", "search"],
+          "query": [
+            {
+              "key": "status",
+              "value": "ACTIVE"
+            }
+          ]
+        },
+        "description": "Queries the StatusNextReviewIndex GSI for all capsules with the given status (ACTIVE, DELIVERED or CANCELLED). Expected: 200 with {\"items\": [...], \"count\": N}."
+      },
+      "response": []
+    },
+    {
+      "name": "Search capsules - missing status (400)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/capsules/search",
+          "host": ["{{base_url}}"],
+          "path": ["capsules", "search"]
+        },
+        "description": "No `status` query param. Expected: 400 with {\"error\": \"Missing required query parameter: status\"}."
+      },
+      "response": []
+    }
+  ]
+}

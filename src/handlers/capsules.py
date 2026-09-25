@@ -11,10 +11,18 @@ from src.common.validation import validate_capsule_payload
 STATUS_ACTIVE = "ACTIVE"
 STATUS_DELIVERED = "DELIVERED"
 STATUS_CANCELLED = "CANCELLED"
+VALID_STATUSES = {STATUS_ACTIVE, STATUS_DELIVERED, STATUS_CANCELLED}
+
+GSI_NAME = "StatusNextReviewIndex"
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _get_path_id(event):
+    """Safely extract the capsule id from the path parameters."""
+    return (event.get("pathParameters") or {}).get("id")
 
 
 def _next_review(interval_hours: float) -> str:
@@ -53,7 +61,12 @@ def create(event, context):
 # READ (all) - GET /capsules
 def list_capsules(event, context):
     query_params = (event.get("queryStringParameters") or {})
-    limit = int(query_params.get("limit", 20))
+    try:
+        limit = int(query_params.get("limit", 20))
+        if limit < 1:
+            raise ValueError
+    except (TypeError, ValueError):
+        return build_response(400, {"error": '"limit" must be a positive integer'})
 
     scan_kwargs = {"Limit": limit}
 
@@ -75,7 +88,9 @@ def list_capsules(event, context):
 
 # READ (one) - GET /capsules/{id}
 def get_capsule(event, context):
-    capsule_id = event["pathParameters"]["id"]
+    capsule_id = _get_path_id(event)
+    if not capsule_id:
+        return build_response(400, {"error": "Missing path parameter: id"})
 
     try:
         result = table.get_item(Key={"id": capsule_id})
@@ -90,7 +105,9 @@ def get_capsule(event, context):
 
 # UPDATE - PUT /capsules/{id}
 def update_capsule(event, context):
-    capsule_id = event["pathParameters"]["id"]
+    capsule_id = _get_path_id(event)
+    if not capsule_id:
+        return build_response(400, {"error": "Missing path parameter: id"})
     data = parse_body(event)
     error = validate_capsule_payload(data)
     if error:
@@ -124,7 +141,9 @@ def update_capsule(event, context):
 
 # DELETE - DELETE /capsules/{id}
 def delete_capsule(event, context):
-    capsule_id = event["pathParameters"]["id"]
+    capsule_id = _get_path_id(event)
+    if not capsule_id:
+        return build_response(400, {"error": "Missing path parameter: id"})
 
     try:
         table.delete_item(
@@ -141,7 +160,9 @@ def delete_capsule(event, context):
 
 # EXTRA - PATCH /capsules/{id}/checkin
 def check_in(event, context):
-    capsule_id = event["pathParameters"]["id"]
+    capsule_id = _get_path_id(event)
+    if not capsule_id:
+        return build_response(400, {"error": "Missing path parameter: id"})
 
     try:
         result = table.get_item(Key={"id": capsule_id})
@@ -151,6 +172,7 @@ def check_in(event, context):
 
         interval_hours = item["checkInIntervalHours"]
         now = _now_iso()
+        next_review_value = _next_review(float(interval_hours))
 
         table.update_item(
             Key={"id": capsule_id},
@@ -159,13 +181,44 @@ def check_in(event, context):
             ExpressionAttributeNames={"#st": "status"},
             ExpressionAttributeValues={
                 ":now": now,
-                ":next": _next_review(float(interval_hours)),
+                ":next": next_review_value,
                 ":active": STATUS_ACTIVE,
             },
         )
-        return build_response(200, {"message": "Check-in registered", "nextReview": _next_review(float(interval_hours))})
+        return build_response(200, {"message": "Check-in registered", "nextReview": next_review_value})
     except ClientError as err:
         if err.response["Error"]["Code"] == "ConditionalCheckFailedException":
             return build_response(404, {"error": "Capsule not found or not active"})
         print(f"ERROR during check-in: {err}")
         return build_response(500, {"error": "Could not register check-in"})
+
+
+# SEARCH - GET /capsules/search?status=ACTIVE
+def search_capsules(event, context):
+    query_params = (event.get("queryStringParameters") or {})
+    status = query_params.get("status")
+
+    if not status:
+        return build_response(400, {"error": "Missing required query parameter: status"})
+
+    status = status.strip().upper()
+    if status not in VALID_STATUSES:
+        return build_response(400, {
+            "error": f"Invalid status: must be one of {', '.join(sorted(VALID_STATUSES))}"
+        })
+
+    try:
+        result = table.query(
+            IndexName=GSI_NAME,
+            KeyConditionExpression="#st = :status",
+            ExpressionAttributeNames={"#st": "status"},
+            ExpressionAttributeValues={":status": status},
+        )
+        response_body = {
+            "items": result.get("Items", []),
+            "count": result.get("Count", 0),
+        }
+        return build_response(200, response_body)
+    except ClientError as err:
+        print(f"ERROR searching capsules by status: {err}")
+        return build_response(500, {"error": "Could not search capsules"})

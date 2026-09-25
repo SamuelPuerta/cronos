@@ -4,3 +4,4 @@ __pycache__/
 .serverless/
 .env
 *.pyc
+.pytest_cache/

@@ -13,7 +13,7 @@ provider:
 
   environment:
     CAPSULES_TABLE: ${self:service}-capsules-${sls:stage}
-    NOTIFICATION_SENDER: your-verified-email@example.com
+    NOTIFICATION_SENDER: puertasamuel04@gmail.com
   httpApi:
     cors: true
   iam:
@@ -56,6 +56,13 @@ functions:
     events:
       - httpApi:
           path: /capsules
+          method: get
+
+  search:
+    handler: src/handlers/capsules.search_capsules
+    events:
+      - httpApi:
+          path: /capsules/search
           method: get
 
   get:
@@ -118,7 +125,7 @@ resources:
             Projection:
               ProjectionType: ALL
 
-  package:
+package:
   patterns:
     - "!venv/**"
     - "!frontend/**"
