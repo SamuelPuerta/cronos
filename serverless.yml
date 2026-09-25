@@ -1,0 +1,123 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: cronostime
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: cronos
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: cronos
+
+provider:
+  name: aws
+  runtime: python3.14
+  architecture: arm64
+  region: us-east-1
+
+  environment:
+    CAPSULES_TABLE: ${self:service}-capsules-${sls:stage}
+    NOTIFICATION_SENDER: your-verified-email@example.com
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [CapsulesTable, Arn]
+            - Fn::Join:
+                - "/"
+                - - Fn::GetAtt: [CapsulesTable, Arn]
+                  - "index"
+                  - "StatusNextReviewIndex"
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: "*"
+  # Uncomment to easily set up a custom domain. Read the docs for more details:
+  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
+  # domain: api.example.com
+
+functions:
+  create:
+    handler: src/handlers/capsules.create
+    events:
+      - httpApi:
+          path: /capsules
+          method: post
+
+  list:
+    handler: src/handlers/capsules.list_capsules
+    events:
+      - httpApi:
+          path: /capsules
+          method: get
+
+  get:
+    handler: src/handlers/capsules.get_capsule
+    events:
+      - httpApi:
+          path: /capsules/{id}
+          method: get
+
+  update:
+    handler: src/handlers/capsules.update_capsule
+    events:
+      - httpApi:
+          path: /capsules/{id}
+          method: put
+
+  remove:
+    handler: src/handlers/capsules.delete_capsule
+    events:
+      - httpApi:
+          path: /capsules/{id}
+          method: delete
+
+  checkIn:
+    handler: src/handlers/capsules.check_in
+    events:
+      - httpApi:
+          path: /capsules/{id}/checkin
+          method: patch
+
+  reviewExpirations:
+    handler: src/handlers/automation.review_expirations
+    events:
+      - schedule: rate(15 minutes)
+
+resources:
+  Resources:
+    CapsulesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.CAPSULES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+          - AttributeName: nextReview
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: StatusNextReviewIndex
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: nextReview
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline

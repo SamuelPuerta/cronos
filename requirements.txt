@@ -1,0 +1,3 @@
+# boto3 is already included in the Lambda Python runtime,
+# listed here only for local development/testing clarity
+boto3>=1.34.0
