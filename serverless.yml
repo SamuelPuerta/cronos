@@ -118,6 +118,16 @@ resources:
             Projection:
               ProjectionType: ALL
 
+  package:
+  patterns:
+    - "!venv/**"
+    - "!frontend/**"
+    - "!docs/**"
+    - "!tests/**"
+    - "!postman/**"
+    - "!node_modules/**"
+    - "!.git/**"
+
 plugins:
   - serverless-python-requirements
   - serverless-offline

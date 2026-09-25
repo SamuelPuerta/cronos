@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRONOS — Time Capsule</title>
+  </head>
+  <body>
+    <h1>CRONOS</h1>
+    <p>
+      Create a message that gets delivered automatically if you stop checking
+      in.
+    </p>
+
+    <form id="create-form">
+      <label>Your email <input type="email" id="ownerEmail" required /></label
+      ><br />
+      <label
+        >Recipient email
+        <input type="email" id="recipientEmail" required /></label
+      ><br />
+      <label>Message <textarea id="message" required></textarea></label><br />
+      <label
+        >Check-in interval (hours)
+        <input
+          type="number"
+          id="checkInIntervalHours"
+          value="24"
+          required /></label
+      ><br />
+      <button type="submit">Create capsule</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+      const API_URL = "PASTE_YOUR_API_GATEWAY_URL_HERE";
+
+      document
+        .getElementById("create-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const payload = {
+            ownerEmail: document.getElementById("ownerEmail").value,
+            recipientEmail: document.getElementById("recipientEmail").value,
+            message: document.getElementById("message").value,
+            checkInIntervalHours: Number(
+              document.getElementById("checkInIntervalHours").value,
+            ),
+          };
+
+          const res = await fetch(`${API_URL}/capsules`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+
+          if (res.ok) {
+            const checkinLink = `${window.location.origin}/checkin.html?id=${data.id}`;
+            document.getElementById("result").innerHTML =
+              `<p>Capsule created. Save this check-in link:</p><a href="${checkinLink}">${checkinLink}</a>`;
+          } else {
+            document.getElementById("result").innerText =
+              `Error: ${data.error}`;
+          }
+        });
+    </script>
+  </body>
+</html>

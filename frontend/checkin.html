@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRONOS — Check-in</title>
+  </head>
+  <body>
+    <h1>Check-in</h1>
+    <div id="status">Loading...</div>
+    <button id="checkin-btn">I'm still active</button>
+
+    <script>
+      const API_URL = "PASTE_YOUR_API_GATEWAY_URL_HERE";
+      const params = new URLSearchParams(window.location.search);
+      const capsuleId = params.get("id");
+
+      async function loadCapsule() {
+        const res = await fetch(`${API_URL}/capsules/${capsuleId}`);
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById("status").innerText =
+            `Status: ${data.status} — Last check-in: ${data.lastCheckIn}`;
+        } else {
+          document.getElementById("status").innerText = `Error: ${data.error}`;
+        }
+      }
+
+      document
+        .getElementById("checkin-btn")
+        .addEventListener("click", async () => {
+          const res = await fetch(`${API_URL}/capsules/${capsuleId}/checkin`, {
+            method: "PATCH",
+          });
+          const data = await res.json();
+          document.getElementById("status").innerText = res.ok
+            ? `Check-in successful. Next review: ${data.nextReview}`
+            : `Error: ${data.error}`;
+        });
+
+      loadCapsule();
+    </script>
+  </body>
+</html>
