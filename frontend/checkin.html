@@ -3,40 +3,467 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CRONOS — Check-in</title>
+    <title>Cronos — your sign of life</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --void: #0a0d0b;
+        --panel: #10140f;
+        --ink: #e9e6da;
+        --dim: #8b9389;
+        --moss: #2f4d3a;
+        --moss-bright: #6fa583;
+        --wax: #8a3a34;
+        --wire: rgba(111, 165, 131, 0.22);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      ::selection {
+        background: rgba(111, 165, 131, 0.28);
+      }
+
+      html {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--void);
+        color: var(--ink);
+        font-family: "Spectral", Georgia, serif;
+        font-size: 1.08rem;
+        line-height: 1.7;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: -10%;
+        left: -10%;
+        width: 55vw;
+        height: 55vw;
+        background: radial-gradient(
+          circle,
+          rgba(47, 77, 58, 0.32),
+          transparent 68%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      a {
+        color: var(--moss-bright);
+      }
+
+      .mono {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 62rem;
+        margin: 0 auto;
+        padding: clamp(2rem, 6vw, 4rem) clamp(1.15rem, 4vw, 2rem)
+          clamp(1.5rem, 4vw, 2.5rem);
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        max-width: 40rem;
+      }
+
+      .brand {
+        margin: 0;
+        font-size: clamp(2.7rem, 9vw, 4.2rem);
+        font-weight: 500;
+        line-height: 0.95;
+        letter-spacing: -0.01em;
+      }
+
+      .kicker {
+        margin: 0.8rem 0 1.5rem;
+        font-style: italic;
+        font-size: clamp(1.05rem, 2.6vw, 1.2rem);
+        color: var(--moss-bright);
+      }
+
+      .lede {
+        margin: 0;
+        max-width: 34rem;
+      }
+
+      /* ---------- Divider ---------- */
+      .divider {
+        height: 1px;
+        margin: clamp(2.2rem, 5vw, 3rem) 0;
+        background: linear-gradient(90deg, var(--wire), transparent 75%);
+      }
+
+      /* ---------- Layout ---------- */
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
+        gap: clamp(2rem, 4vw, 3.5rem);
+        align-items: start;
+      }
+
+      @media (max-width: 800px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .note {
+        font-size: 0.98rem;
+        color: var(--dim);
+        border-left: 2px solid var(--wire);
+        padding-left: 1.1rem;
+      }
+
+      .note strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .note-signoff {
+        display: block;
+        margin-top: 1.2rem;
+        font-style: italic;
+        color: var(--dim);
+      }
+
+      /* ---------- Record card ---------- */
+      .letter-card {
+        background: var(--panel);
+        border: 1px solid var(--wire);
+        border-radius: 3px;
+        padding: clamp(1.6rem, 4.5vw, 2.3rem);
+      }
+
+      .letter-card h2 {
+        margin: 0.9rem 0 0.4rem;
+        font-size: 1.3rem;
+        font-weight: 500;
+      }
+
+      /* Postal-stamp style status badge */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.3rem 0.9rem;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.76rem;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        border: 2px solid var(--dim);
+        color: var(--dim);
+        border-radius: 2px;
+        transform: rotate(-2deg);
+      }
+
+      .badge-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .badge-active {
+        color: var(--moss-bright);
+        border-color: var(--moss-bright);
+      }
+
+      .badge-active .badge-dot {
+        animation: pulse 1.8s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(111, 165, 131, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(111, 165, 131, 0);
+        }
+      }
+
+      .badge-delivered {
+        color: #d08377;
+        border-color: var(--wax);
+      }
+
+      .time-remaining {
+        margin: 0.2rem 0 0;
+        font-size: clamp(1.25rem, 3.4vw, 1.5rem);
+        line-height: 1.45;
+      }
+
+      .capsule-dates {
+        margin: 1.3rem 0 0;
+      }
+
+      .date-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.5rem 0;
+        font-size: 0.95rem;
+        border-bottom: 1px dashed var(--wire);
+      }
+
+      .date-row span:first-child {
+        color: var(--dim);
+        font-style: italic;
+      }
+
+      .date-row span:last-child {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.85rem;
+        color: var(--moss-bright);
+        text-align: right;
+      }
+
+      /* ---------- Action ---------- */
+      .submit-btn {
+        width: 100%;
+        margin-top: 1.6rem;
+        padding: 0.9rem 1.4rem;
+        font-family: "Spectral", Georgia, serif;
+        font-size: 1.02rem;
+        font-weight: 500;
+        color: var(--void);
+        background: var(--moss-bright);
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: filter 0.12s ease, transform 0.05s ease;
+      }
+
+      .submit-btn:hover:not(:disabled) {
+        filter: brightness(1.08);
+      }
+
+      .submit-btn:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      #status {
+        margin-top: 1.1rem;
+        font-size: 0.92rem;
+        font-style: italic;
+        color: var(--dim);
+        min-height: 1.2rem;
+      }
+
+      #status:empty {
+        margin: 0;
+      }
+
+      /* ---------- Footer ---------- */
+      footer {
+        position: relative;
+        z-index: 1;
+        max-width: 62rem;
+        margin: 0 auto;
+        padding: 1.4rem clamp(1.15rem, 4vw, 2rem) 2rem;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--dim);
+        border-top: 1px solid var(--wire);
+      }
+
+      footer a {
+        color: var(--moss-bright);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .badge-active .badge-dot {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>Check-in</h1>
-    <div id="status">Loading...</div>
-    <button id="checkin-btn">I'm still active</button>
+    <div class="wrap">
+      <div class="hero">
+        <h1 class="brand">Cronos</h1>
+        <p class="kicker">a dead letter office, of sorts</p>
+        <p class="lede">
+          Your letter is in the drawer, sealed. All Cronos asks for is a sign
+          of life before each interval runs out — go quiet for too long and
+          the letter leaves on its own.
+        </p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="layout">
+        <p class="note">
+          This page is the <strong>spare key</strong> you were given when you
+          filed the letter. Every visit and every check-in pushes the
+          delivery date forward.
+          <span class="note-signoff">— no account, no password, just the link</span>
+        </p>
+
+        <section class="letter-card">
+          <span id="status-badge" class="badge" hidden></span>
+          <h2>Your letter, on file</h2>
+
+          <p id="time-remaining" class="time-remaining"></p>
+
+          <div id="capsule-dates" class="capsule-dates"></div>
+
+          <button id="checkin-btn" class="submit-btn">I'm still here</button>
+
+          <div id="status" aria-live="polite">Fetching the file…</div>
+        </section>
+      </div>
+
+      <footer>
+        <span>Cronos, an automated dead letter office</span>
+        <span
+          >Built by
+          <a
+            href="https://samuel-puerta.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Samuel Puerta</a
+          ></span
+        >
+      </footer>
+    </div>
 
     <script>
       const API_URL = "https://son8ss3zrd.execute-api.us-east-1.amazonaws.com";
       const params = new URLSearchParams(window.location.search);
       const capsuleId = params.get("id");
 
-      async function loadCapsule() {
-        const res = await fetch(`${API_URL}/capsules/${capsuleId}`);
-        const data = await res.json();
-        if (res.ok) {
-          document.getElementById("status").innerText =
-            `Status: ${data.status} — Last check-in: ${data.lastCheckIn}`;
+      const badgeEl = document.getElementById("status-badge");
+      const remainingEl = document.getElementById("time-remaining");
+      const datesEl = document.getElementById("capsule-dates");
+      const statusEl = document.getElementById("status");
+      const checkinBtn = document.getElementById("checkin-btn");
+
+      // --- Presentation helpers (formatting only, no API logic) ---
+      function fmt(iso) {
+        const d = new Date(iso);
+        return isNaN(d)
+          ? String(iso)
+          : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+      }
+
+      function humanRemaining(nextReviewIso) {
+        const ms = new Date(nextReviewIso).getTime() - Date.now();
+        if (isNaN(ms)) return "";
+        if (ms <= 0) return "The interval has run out — Cronos is reaching for the envelope.";
+        const mins = Math.floor(ms / 60000);
+        const days = Math.floor(mins / 1440);
+        const hours = Math.floor((mins % 1440) / 60);
+        const parts = [];
+        if (days) parts.push(`${days}d`);
+        if (hours) parts.push(`${hours}h`);
+        parts.push(`${mins % 60}m`);
+        return `Cronos sends the letter in ≈ ${parts.join(" ")} — unless you check in.`;
+      }
+
+      function renderState(data) {
+        const status = String(data.status || "").toUpperCase();
+        badgeEl.hidden = false;
+        badgeEl.textContent = status === "ACTIVE" ? "ON FILE" : status;
+        const dot = document.createElement("span");
+        dot.className = "badge-dot";
+        dot.setAttribute("aria-hidden", "true");
+        badgeEl.prepend(dot);
+
+        if (status === "ACTIVE") {
+          badgeEl.className = "badge badge-active";
+          remainingEl.innerHTML = humanRemaining(data.nextReview);
+          datesEl.innerHTML =
+            `<div class="date-row"><span>last sign of life</span><span>${fmt(data.lastCheckIn)}</span></div>` +
+            `<div class="date-row"><span>Cronos checks again</span><span>${fmt(data.nextReview)}</span></div>`;
+          checkinBtn.disabled = false;
+        } else if (status === "DELIVERED") {
+          badgeEl.className = "badge badge-delivered";
+          remainingEl.innerHTML = data.deliveredAt
+            ? `Cronos delivered the letter on <span class="mono">${fmt(data.deliveredAt)}</span>.`
+            : "This letter has already left the drawer.";
+          datesEl.innerHTML = data.lastCheckIn
+            ? `<div class="date-row"><span>last sign of life</span><span>${fmt(data.lastCheckIn)}</span></div>`
+            : "";
+          checkinBtn.disabled = true;
         } else {
-          document.getElementById("status").innerText = `Error: ${data.error}`;
+          badgeEl.className = "badge";
+          remainingEl.innerHTML = `The letter is no longer on file — it was ${status.toLowerCase()}.`;
+          datesEl.innerHTML = data.lastCheckIn
+            ? `<div class="date-row"><span>last sign of life</span><span>${fmt(data.lastCheckIn)}</span></div>`
+            : "";
+          checkinBtn.disabled = true;
         }
       }
 
-      document
-        .getElementById("checkin-btn")
-        .addEventListener("click", async () => {
+      // --- API logic (endpoints, methods and payload unchanged) ---
+      async function loadCapsule(keepMessage = false) {
+        if (!capsuleId) {
+          statusEl.innerText = "This slip doesn't say which letter it belongs to — check the link.";
+          checkinBtn.disabled = true;
+          return;
+        }
+        if (!keepMessage) statusEl.innerText = "Fetching the file…";
+        try {
+          const res = await fetch(`${API_URL}/capsules/${capsuleId}`);
+          const data = await res.json();
+          if (res.ok) {
+            renderState(data);
+            if (!keepMessage) statusEl.innerText = "";
+          } else {
+            statusEl.innerText = `Cronos couldn't find that letter: ${data.error}`;
+            checkinBtn.disabled = true;
+          }
+        } catch (err) {
+          statusEl.innerText = "Could not reach Cronos. Please try again.";
+          checkinBtn.disabled = true;
+        }
+      }
+
+      checkinBtn.addEventListener("click", async () => {
+        checkinBtn.disabled = true;
+        checkinBtn.textContent = "Recording it…";
+        try {
           const res = await fetch(`${API_URL}/capsules/${capsuleId}/checkin`, {
             method: "PATCH",
           });
           const data = await res.json();
-          document.getElementById("status").innerText = res.ok
-            ? `Check-in successful. Next review: ${data.nextReview}`
-            : `Error: ${data.error}`;
-        });
+          statusEl.innerText = res.ok
+            ? `Sign of life recorded. Cronos will look again after ${fmt(data.nextReview)}.`
+            : `Cronos couldn't file that: ${data.error}`;
+          if (res.ok) loadCapsule(true); // refresh the visual state, keep the message
+        } catch (err) {
+          statusEl.innerText = "Could not reach Cronos. Please try again.";
+        } finally {
+          checkinBtn.textContent = "I'm still here";
+        }
+      });
 
       loadCapsule();
     </script>

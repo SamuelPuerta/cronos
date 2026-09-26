@@ -3,35 +3,474 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CRONOS — Time Capsule</title>
+    <title>Cronos — a dead letter office, of sorts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --void: #0a0d0b;
+        --panel: #10140f;
+        --ink: #e9e6da;
+        --dim: #8b9389;
+        --moss: #2f4d3a;
+        --moss-bright: #6fa583;
+        --wax: #8a3a34;
+        --wire: rgba(111, 165, 131, 0.22);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      ::selection {
+        background: rgba(111, 165, 131, 0.28);
+      }
+
+      html {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--void);
+        color: var(--ink);
+        font-family: "Spectral", Georgia, serif;
+        font-size: 1.08rem;
+        line-height: 1.7;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: -10%;
+        left: -10%;
+        width: 55vw;
+        height: 55vw;
+        background: radial-gradient(
+          circle,
+          rgba(47, 77, 58, 0.32),
+          transparent 68%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      a {
+        color: var(--moss-bright);
+      }
+
+      .mono {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 62rem;
+        margin: 0 auto;
+        padding: clamp(2rem, 6vw, 4rem) clamp(1.15rem, 4vw, 2rem)
+          clamp(1.5rem, 4vw, 2.5rem);
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        max-width: 40rem;
+      }
+
+      .brand {
+        margin: 0;
+        font-size: clamp(3.6rem, 13vw, 6.5rem);
+        font-weight: 500;
+        line-height: 0.95;
+        letter-spacing: -0.01em;
+      }
+
+      .kicker {
+        margin: 0.9rem 0 1.8rem;
+        font-style: italic;
+        font-size: clamp(1.05rem, 2.6vw, 1.2rem);
+        color: var(--moss-bright);
+      }
+
+      .lede {
+        margin: 0 0 1.1rem;
+        max-width: 34rem;
+      }
+
+      .lede:last-of-type {
+        margin-bottom: 0;
+      }
+
+      /* ---------- Divider ---------- */
+      .divider {
+        height: 1px;
+        margin: clamp(2.5rem, 6vw, 3.5rem) 0;
+        background: linear-gradient(90deg, var(--wire), transparent 75%);
+      }
+
+      /* ---------- Layout ---------- */
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
+        gap: clamp(2rem, 4vw, 3.5rem);
+        align-items: start;
+      }
+
+      @media (max-width: 800px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .note {
+        font-size: 0.98rem;
+        color: var(--dim);
+        border-left: 2px solid var(--wire);
+        padding-left: 1.1rem;
+      }
+
+      .note strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .note-signoff {
+        display: block;
+        margin-top: 1.2rem;
+        font-style: italic;
+        color: var(--dim);
+      }
+
+      /* ---------- Letter form ---------- */
+      .letter-card {
+        background: var(--panel);
+        border: 1px solid var(--wire);
+        border-radius: 3px;
+        padding: clamp(1.6rem, 4.5vw, 2.3rem);
+      }
+
+      .letter-card h2 {
+        margin: 0 0 1.5rem;
+        font-size: 1.3rem;
+        font-weight: 500;
+      }
+
+      .field {
+        display: block;
+        margin-bottom: 1.2rem;
+      }
+
+      .field-label {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-size: 0.85rem;
+        color: var(--dim);
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 0.75rem 0.85rem;
+        font-family: "Spectral", Georgia, serif;
+        font-size: 1.05rem;
+        color: var(--ink);
+        caret-color: var(--moss-bright);
+        background: var(--void);
+        border: 1px solid var(--wire);
+        border-radius: 3px;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: #4c5750;
+        font-style: italic;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--moss-bright);
+        box-shadow: 0 0 0 3px rgba(111, 165, 131, 0.15);
+      }
+
+      textarea {
+        min-height: 8rem;
+        resize: vertical;
+        font-size: 1.1rem;
+        line-height: 1.6;
+      }
+
+      .interval-row {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+      }
+
+      .interval-row input {
+        width: 5rem;
+        flex: 0 0 auto;
+      }
+
+      .interval-row span {
+        color: var(--dim);
+        font-size: 0.98rem;
+      }
+
+      .hint {
+        margin: 0.5rem 0 0;
+        font-size: 0.85rem;
+        color: var(--dim);
+        font-style: italic;
+      }
+
+      .submit-btn {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 0.9rem 1.4rem;
+        font-family: "Spectral", Georgia, serif;
+        font-size: 1.02rem;
+        font-weight: 500;
+        color: var(--void);
+        background: var(--moss-bright);
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: filter 0.12s ease, transform 0.05s ease;
+      }
+
+      .submit-btn:hover:not(:disabled) {
+        filter: brightness(1.08);
+      }
+
+      .submit-btn:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      /* ---------- Result ---------- */
+      #result {
+        margin-top: 1.3rem;
+      }
+
+      #result:empty {
+        margin: 0;
+      }
+
+      .receipt {
+        background: var(--panel);
+        border: 1px solid var(--wire);
+        border-radius: 3px;
+        padding: clamp(1.4rem, 4vw, 1.9rem);
+        animation: settle 0.28s ease both;
+      }
+
+      @keyframes settle {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .stamp {
+        display: inline-block;
+        padding: 0.3rem 0.9rem;
+        margin-bottom: 1rem;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.76rem;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        color: var(--moss-bright);
+        border: 2px solid var(--moss-bright);
+        border-radius: 2px;
+        transform: rotate(-2deg);
+      }
+
+      .receipt p {
+        margin: 0 0 1rem;
+        color: var(--dim);
+      }
+
+      .checkin-link {
+        display: block;
+        padding: 0.75rem 0.9rem;
+        margin-bottom: 1rem;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.82rem;
+        word-break: break-all;
+        color: var(--moss-bright);
+        background: var(--void);
+        border: 1px solid var(--wire);
+        border-radius: 3px;
+      }
+
+      .receipt-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      .copy-btn,
+      .open-link {
+        padding: 0.6rem 1.1rem;
+        font-size: 0.92rem;
+        border-radius: 3px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .copy-btn {
+        color: var(--void);
+        background: var(--moss-bright);
+        border: none;
+      }
+
+      .open-link {
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--wire);
+      }
+
+      .form-error {
+        margin: 0;
+        padding: 0.85rem 1rem;
+        font-size: 0.95rem;
+        color: #dba39e;
+        background: rgba(138, 58, 52, 0.12);
+        border: 1px solid rgba(138, 58, 52, 0.45);
+        border-radius: 3px;
+      }
+
+      /* ---------- Footer ---------- */
+      footer {
+        position: relative;
+        z-index: 1;
+        max-width: 62rem;
+        margin: 0 auto;
+        padding: 1.4rem clamp(1.15rem, 4vw, 2rem) 2rem;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--dim);
+        border-top: 1px solid var(--wire);
+      }
+
+      footer a {
+        color: var(--moss-bright);
+      }
+    </style>
   </head>
   <body>
-    <h1>CRONOS</h1>
-    <p>
-      Create a message that gets delivered automatically if you stop checking
-      in.
-    </p>
+    <div class="wrap">
+      <div class="hero">
+        <h1 class="brand">Cronos</h1>
+        <p class="kicker">a dead letter office, of sorts</p>
 
-    <form id="create-form">
-      <label>Your email <input type="email" id="ownerEmail" required /></label
-      ><br />
-      <label
-        >Recipient email
-        <input type="email" id="recipientEmail" required /></label
-      ><br />
-      <label>Message <textarea id="message" required></textarea></label><br />
-      <label
-        >Check-in interval (hours)
-        <input
-          type="number"
-          id="checkInIntervalHours"
-          value="24"
-          required /></label
-      ><br />
-      <button type="submit">Create capsule</button>
-    </form>
+        <p class="lede">
+          The old stories say Cronos ruled over time itself — and that he
+          swallowed whatever wasn't looked after in time. This is a much
+          smaller version of that idea: a quiet clerk who holds onto a
+          letter, checks in on you now and then, and only sends it along if
+          you go quiet for longer than you said you would.
+        </p>
+        <p class="lede">
+          Write it below, say who it's for, and tell Cronos how long to wait
+          between one sign of life and the next. Keep checking in from your
+          own private slip, and nothing happens. Stop, and Cronos assumes
+          the worst.
+        </p>
+      </div>
 
-    <div id="result"></div>
+      <div class="divider"></div>
+
+      <div class="layout">
+        <p class="note">
+          There's no dashboard, no account, nothing to lose track of.
+          <strong>Just the link</strong> you get after writing — treat it
+          like a spare key, not a bookmark.
+          <span class="note-signoff">— keep it somewhere you'll remember</span>
+        </p>
+
+        <form id="create-form" class="letter-card">
+          <h2>Write your letter</h2>
+
+          <label class="field">
+            <span class="field-label">From</span>
+            <input type="email" id="ownerEmail" placeholder="your@email.com" required />
+          </label>
+
+          <label class="field">
+            <span class="field-label">To</span>
+            <input
+              type="email"
+              id="recipientEmail"
+              placeholder="recipient@email.com"
+              required
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Message</span>
+            <textarea
+              id="message"
+              required
+              placeholder="If you are reading this…"
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Check in every</span>
+            <div class="interval-row">
+              <input
+                type="number"
+                id="checkInIntervalHours"
+                value="24"
+                min="1"
+                step="1"
+                required
+              />
+              <span>hours, or Cronos sends it</span>
+            </div>
+            <p class="hint">most people leave this at a day or two</p>
+          </label>
+
+          <button type="submit" class="submit-btn">Leave it with Cronos</button>
+        </form>
+
+        <div></div>
+        <div id="result" aria-live="polite"></div>
+      </div>
+
+      <footer>
+        <span>Cronos, an automated dead letter office</span>
+        <span
+          >Built by
+          <a
+            href="https://samuel-puerta.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Samuel Puerta</a
+          ></span
+        >
+      </footer>
+    </div>
 
     <script>
       const API_URL = "https://son8ss3zrd.execute-api.us-east-1.amazonaws.com";
@@ -49,22 +488,60 @@
             ),
           };
 
-          const res = await fetch(`${API_URL}/capsules`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          const data = await res.json();
+          const button = e.target.querySelector("button[type=submit]");
+          const result = document.getElementById("result");
+          button.disabled = true;
+          button.textContent = "Filing it away…";
+          result.innerHTML = "";
 
-          if (res.ok) {
-            const checkinLink = new URL(`checkin.html?id=${data.id}`, window.location.href).href;
-            document.getElementById("result").innerHTML =
-              `<p>Capsule created. Save this check-in link:</p><a href="${checkinLink}">${checkinLink}</a>`;
-          } else {
-            document.getElementById("result").innerText =
-              `Error: ${data.error}`;
+          try {
+            const res = await fetch(`${API_URL}/capsules`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+              const checkinLink = new URL(
+                `checkin.html?id=${data.id}`,
+                window.location.href,
+              ).href;
+              result.innerHTML = `
+                <div class="receipt">
+                  <span class="stamp">FILED</span>
+                  <p>Cronos has it now. Save this check-in link and visit it
+                  before each interval ends — that's all it takes to keep
+                  the letter sealed.</p>
+                  <a class="checkin-link" href="${checkinLink}">${checkinLink}</a>
+                  <div class="receipt-actions">
+                    <button type="button" class="copy-btn" data-link="${checkinLink}">Copy link</button>
+                    <a class="open-link" href="${checkinLink}">Open check-in page</a>
+                  </div>
+                </div>`;
+              result.scrollIntoView({ behavior: "smooth", block: "center" });
+            } else {
+              result.innerHTML = `<p class="form-error">${data.error}</p>`;
+            }
+          } catch (err) {
+            result.innerHTML = `<p class="form-error">Could not reach Cronos. Please try again.</p>`;
+          } finally {
+            button.disabled = false;
+            button.textContent = "Leave it with Cronos";
           }
         });
+
+      document.getElementById("result").addEventListener("click", async (e) => {
+        const btn = e.target.closest(".copy-btn");
+        if (!btn) return;
+        try {
+          await navigator.clipboard.writeText(btn.dataset.link);
+          btn.textContent = "Copied";
+          setTimeout(() => (btn.textContent = "Copy link"), 1800);
+        } catch (err) {
+          btn.textContent = "Copy manually";
+        }
+      });
     </script>
   </body>
 </html>
