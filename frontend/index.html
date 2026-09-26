@@ -73,27 +73,37 @@
       .wrap {
         position: relative;
         z-index: 1;
-        max-width: 62rem;
+        max-width: 84rem;
+        min-height: 100dvh;
         margin: 0 auto;
-        padding: clamp(2rem, 6vw, 4rem) clamp(1.15rem, 4vw, 2rem)
-          clamp(1.5rem, 4vw, 2.5rem);
+        padding: clamp(1.4rem, 3.5vh, 2.5rem) clamp(1.15rem, 4vw, 3.5rem) 0;
+        display: flex;
+        flex-direction: column;
       }
 
-      /* ---------- Hero ---------- */
-      .hero {
-        max-width: 40rem;
+      /* ---------- Main stage: intro left, form right ---------- */
+      .stage {
+        flex: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: clamp(2rem, 4.5vw, 4rem);
+        align-items: center;
+      }
+
+      .intro {
+        min-width: 0;
       }
 
       .brand {
         margin: 0;
-        font-size: clamp(3.6rem, 13vw, 6.5rem);
+        font-size: clamp(3.2rem, 7.5vw, 5.2rem);
         font-weight: 500;
         line-height: 0.95;
         letter-spacing: -0.01em;
       }
 
       .kicker {
-        margin: 0.9rem 0 1.8rem;
+        margin: 0.8rem 0 1.5rem;
         font-style: italic;
         font-size: clamp(1.05rem, 2.6vw, 1.2rem);
         color: var(--moss-bright);
@@ -108,28 +118,9 @@
         margin-bottom: 0;
       }
 
-      /* ---------- Divider ---------- */
-      .divider {
-        height: 1px;
-        margin: clamp(2.5rem, 6vw, 3.5rem) 0;
-        background: linear-gradient(90deg, var(--wire), transparent 75%);
-      }
-
-      /* ---------- Layout ---------- */
-      .layout {
-        display: grid;
-        grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
-        gap: clamp(2rem, 4vw, 3.5rem);
-        align-items: start;
-      }
-
-      @media (max-width: 800px) {
-        .layout {
-          grid-template-columns: 1fr;
-        }
-      }
-
       .note {
+        margin-top: 1.6rem;
+        max-width: 30rem;
         font-size: 0.98rem;
         color: var(--dim);
         border-left: 2px solid var(--wire);
@@ -143,9 +134,22 @@
 
       .note-signoff {
         display: block;
-        margin-top: 1.2rem;
+        margin-top: 1.1rem;
         font-style: italic;
         color: var(--dim);
+      }
+
+      .right-col {
+        min-width: 0;
+        border-left: 1px solid var(--wire);
+        padding-left: clamp(2rem, 4.5vw, 4rem);
+      }
+
+      .divider {
+        display: none;
+        height: 1px;
+        margin: 2.2rem 0 0;
+        background: linear-gradient(90deg, var(--wire), transparent 75%);
       }
 
       /* ---------- Letter form ---------- */
@@ -153,18 +157,18 @@
         background: var(--panel);
         border: 1px solid var(--wire);
         border-radius: 3px;
-        padding: clamp(1.6rem, 4.5vw, 2.3rem);
+        padding: clamp(1.5rem, 3.5vw, 2.1rem);
       }
 
       .letter-card h2 {
-        margin: 0 0 1.5rem;
+        margin: 0 0 1.4rem;
         font-size: 1.3rem;
         font-weight: 500;
       }
 
       .field {
         display: block;
-        margin-bottom: 1.2rem;
+        margin-bottom: 1.1rem;
       }
 
       .field-label {
@@ -177,7 +181,7 @@
       input,
       textarea {
         width: 100%;
-        padding: 0.75rem 0.85rem;
+        padding: 0.7rem 0.85rem;
         font-family: "Spectral", Georgia, serif;
         font-size: 1.05rem;
         color: var(--ink);
@@ -201,7 +205,7 @@
       }
 
       textarea {
-        min-height: 8rem;
+        min-height: 7.5rem;
         resize: vertical;
         font-size: 1.1rem;
         line-height: 1.6;
@@ -261,7 +265,7 @@
 
       /* ---------- Result ---------- */
       #result {
-        margin-top: 1.3rem;
+        margin-top: 1.2rem;
       }
 
       #result:empty {
@@ -272,7 +276,7 @@
         background: var(--panel);
         border: 1px solid var(--wire);
         border-radius: 3px;
-        padding: clamp(1.4rem, 4vw, 1.9rem);
+        padding: clamp(1.4rem, 3vw, 1.8rem);
         animation: settle 0.28s ease both;
       }
 
@@ -360,13 +364,13 @@
       footer {
         position: relative;
         z-index: 1;
-        max-width: 62rem;
-        margin: 0 auto;
-        padding: 1.4rem clamp(1.15rem, 4vw, 2rem) 2rem;
+        margin-top: 1.6rem;
+        padding: 1.2rem 0 1.6rem;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 0.75rem;
         font-size: 0.85rem;
         color: var(--dim);
         border-top: 1px solid var(--wire);
@@ -375,93 +379,184 @@
       footer a {
         color: var(--moss-bright);
       }
+
+      /* ---------- Language switch ---------- */
+      .lang-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+      }
+
+      .lang-opt {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        color: var(--dim);
+        transition: color 0.15s ease;
+      }
+
+      .lang-opt.active {
+        color: var(--moss-bright);
+      }
+
+      .lang-toggle {
+        position: relative;
+        width: 2.6rem;
+        height: 1.3rem;
+        padding: 0;
+        background: transparent;
+        border: 1px solid var(--wire);
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .lang-toggle .knob {
+        position: absolute;
+        top: 50%;
+        left: 2px;
+        transform: translateY(-50%);
+        width: 0.95rem;
+        height: 0.95rem;
+        border-radius: 50%;
+        background: var(--moss-bright);
+        transition: left 0.15s ease;
+      }
+
+      .lang-toggle[aria-checked="true"] .knob {
+        left: calc(100% - 0.95rem - 2px);
+      }
+
+      /* ---------- Mobile: back to normal stacked scroll ---------- */
+      @media (max-width: 880px) {
+        .wrap {
+          min-height: auto;
+        }
+
+        .stage {
+          grid-template-columns: 1fr;
+          gap: 0;
+          align-items: start;
+        }
+
+        .brand {
+          font-size: clamp(3rem, 12vw, 4.2rem);
+        }
+
+        .divider {
+          display: block;
+        }
+
+        .right-col {
+          border-left: none;
+          padding-left: 0;
+          margin-top: 2.2rem;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <div class="hero">
-        <h1 class="brand">Cronos</h1>
-        <p class="kicker">a dead letter office, of sorts</p>
+      <main class="stage">
+        <div class="intro">
+          <h1 class="brand">Cronos</h1>
+          <p class="kicker" data-i18n="kicker">a dead letter office, of sorts</p>
 
-        <p class="lede">
-          The old stories say Cronos ruled over time itself — and that he
-          swallowed whatever wasn't looked after in time. This is a much
-          smaller version of that idea: a quiet clerk who holds onto a
-          letter, checks in on you now and then, and only sends it along if
-          you go quiet for longer than you said you would.
-        </p>
-        <p class="lede">
-          Write it below, say who it's for, and tell Cronos how long to wait
-          between one sign of life and the next. Keep checking in from your
-          own private slip, and nothing happens. Stop, and Cronos assumes
-          the worst.
-        </p>
-      </div>
+          <p class="lede" data-i18n="lede1">
+            The old stories say Cronos ruled over time itself — and that he
+            swallowed whatever wasn't looked after in time. This is a much
+            smaller version of that idea: a quiet clerk who holds onto a
+            letter, checks in on you now and then, and only sends it along if
+            you go quiet for longer than you said you would.
+          </p>
+          <p class="lede" data-i18n="lede2">
+            Write it here, say who it's for, and tell Cronos how long to wait
+            between one sign of life and the next. Keep checking in from your
+            own private slip, and nothing happens. Stop, and Cronos assumes
+            the worst.
+          </p>
 
-      <div class="divider"></div>
+          <p class="note" data-i18n="noteHtml">
+            There's no dashboard, no account, nothing to lose track of.
+            <strong>Just the link</strong> you get after writing — treat it
+            like a spare key, not a bookmark.
+            <span class="note-signoff">— keep it somewhere you'll remember</span>
+          </p>
 
-      <div class="layout">
-        <p class="note">
-          There's no dashboard, no account, nothing to lose track of.
-          <strong>Just the link</strong> you get after writing — treat it
-          like a spare key, not a bookmark.
-          <span class="note-signoff">— keep it somewhere you'll remember</span>
-        </p>
+          <div class="divider"></div>
+        </div>
 
-        <form id="create-form" class="letter-card">
-          <h2>Write your letter</h2>
+        <div class="right-col">
+          <form id="create-form" class="letter-card">
+            <h2 data-i18n="formTitle">Write your letter</h2>
 
-          <label class="field">
-            <span class="field-label">From</span>
-            <input type="email" id="ownerEmail" placeholder="your@email.com" required />
-          </label>
+            <label class="field">
+              <span class="field-label" data-i18n="lblFrom">From</span>
+              <input type="email" id="ownerEmail" placeholder="your@email.com" data-i18n-ph="phOwner" required />
+            </label>
 
-          <label class="field">
-            <span class="field-label">To</span>
-            <input
-              type="email"
-              id="recipientEmail"
-              placeholder="recipient@email.com"
-              required
-            />
-          </label>
-
-          <label class="field">
-            <span class="field-label">Message</span>
-            <textarea
-              id="message"
-              required
-              placeholder="If you are reading this…"
-            ></textarea>
-          </label>
-
-          <label class="field">
-            <span class="field-label">Check in every</span>
-            <div class="interval-row">
+            <label class="field">
+              <span class="field-label" data-i18n="lblTo">To</span>
               <input
-                type="number"
-                id="checkInIntervalHours"
-                value="24"
-                min="1"
-                step="1"
+                type="email"
+                id="recipientEmail"
+                placeholder="recipient@email.com"
+                data-i18n-ph="phTo"
                 required
               />
-              <span>hours, or Cronos sends it</span>
-            </div>
-            <p class="hint">most people leave this at a day or two</p>
-          </label>
+            </label>
 
-          <button type="submit" class="submit-btn">Leave it with Cronos</button>
-        </form>
+            <label class="field">
+              <span class="field-label" data-i18n="lblMsg">Message</span>
+              <textarea
+                id="message"
+                required
+                placeholder="If you are reading this…"
+                data-i18n-ph="phMsg"
+              ></textarea>
+            </label>
 
-        <div></div>
-        <div id="result" aria-live="polite"></div>
-      </div>
+            <label class="field">
+              <span class="field-label" data-i18n="lblEvery">Check in every</span>
+              <div class="interval-row">
+                <input
+                  type="number"
+                  id="checkInIntervalHours"
+                  value="24"
+                  min="1"
+                  step="1"
+                  required
+                />
+                <span data-i18n="intervalSuffix">hours, or Cronos sends it</span>
+              </div>
+              <p class="hint" data-i18n="intervalHint">most people leave this at a day or two</p>
+            </label>
+
+            <button type="submit" class="submit-btn" data-i18n="submit">Leave it with Cronos</button>
+          </form>
+
+          <div id="result" aria-live="polite"></div>
+        </div>
+      </main>
 
       <footer>
-        <span>Cronos, an automated dead letter office</span>
+        <span data-i18n="office">Cronos, an automated dead letter office</span>
+        <span class="lang-switch">
+          <span class="lang-opt active" id="lang-en">EN</span>
+          <button
+            type="button"
+            class="lang-toggle"
+            id="lang-toggle"
+            role="switch"
+            aria-checked="false"
+            aria-label="Switch language / Cambiar idioma"
+          >
+            <span class="knob"></span>
+          </button>
+          <span class="lang-opt" id="lang-es">ES</span>
+        </span>
         <span
-          >Built by
+          ><span data-i18n="builtBy">Built by</span>
           <a
             href="https://samuel-puerta.vercel.app/"
             target="_blank"
@@ -475,6 +570,119 @@
     <script>
       const API_URL = "https://son8ss3zrd.execute-api.us-east-1.amazonaws.com";
 
+      // ---------- Language toggle (presentation only) ----------
+      const I18N = {
+        en: {
+          docTitle: "Cronos — a dead letter office, of sorts",
+          kicker: "a dead letter office, of sorts",
+          lede1:
+            "The old stories say Cronos ruled over time itself — and that he swallowed whatever wasn't looked after in time. This is a much smaller version of that idea: a quiet clerk who holds onto a letter, checks in on you now and then, and only sends it along if you go quiet for longer than you said you would.",
+          lede2:
+            "Write it here, say who it's for, and tell Cronos how long to wait between one sign of life and the next. Keep checking in from your own private slip, and nothing happens. Stop, and Cronos assumes the worst.",
+          noteHtml:
+            'There\'s no dashboard, no account, nothing to lose track of. <strong>Just the link</strong> you get after writing — treat it like a spare key, not a bookmark.<span class="note-signoff">— keep it somewhere you\'ll remember</span>',
+          formTitle: "Write your letter",
+          lblFrom: "From",
+          lblTo: "To",
+          lblMsg: "Message",
+          lblEvery: "Check in every",
+          phOwner: "your@email.com",
+          phTo: "recipient@email.com",
+          phMsg: "If you are reading this…",
+          intervalSuffix: "hours, or Cronos sends it",
+          intervalHint: "most people leave this at a day or two",
+          submit: "Leave it with Cronos",
+          busy: "Filing it away…",
+          stampFiled: "FILED",
+          receiptBody:
+            "Cronos has it now. Save this check-in link and visit it before each interval ends — that's all it takes to keep the letter sealed.",
+          copyLink: "Copy link",
+          copied: "Copied",
+          copyManual: "Copy manually",
+          openPage: "Open check-in page",
+          errNetwork: "Could not reach Cronos. Please try again.",
+          office: "Cronos, an automated dead letter office",
+          builtBy: "Built by",
+        },
+        es: {
+          docTitle: "Cronos — una oficina de cartas muertas, más o menos",
+          kicker: "una oficina de cartas muertas, más o menos",
+          lede1:
+            "Las viejas historias dicen que Cronos reinaba sobre el tiempo — y devoraba todo aquello que no se cuidaba a tiempo. Esta es una versión mucho más pequeña de esa idea: un oficinista silencioso que guarda una carta, pasa a verte de vez en cuando, y solo la envía si guardas silencio más tiempo del que dijiste.",
+          lede2:
+            "Escríbela aquí, di para quién es y dile a Cronos cuánto esperar entre una señal de vida y la siguiente. Mientras sigas confirmando desde tu ficha privada, no pasa nada. Si dejas de hacerlo, Cronos asume lo peor.",
+          noteHtml:
+            'No hay panel, no hay cuenta, nada que perder de vista. <strong>Solo el enlace</strong> que recibes al terminar — trátalo como una llave de repuesto, no como un favorito.<span class="note-signoff">— guárdalo donde vayas a recordarlo</span>',
+          formTitle: "Escribe tu carta",
+          lblFrom: "De",
+          lblTo: "Para",
+          lblMsg: "Mensaje",
+          lblEvery: "Confirma cada",
+          phOwner: "tu@correo.com",
+          phTo: "destinatario@correo.com",
+          phMsg: "Si estás leyendo esto…",
+          intervalSuffix: "horas, o Cronos la envía",
+          intervalHint: "la mayoría lo deja en uno o dos días",
+          submit: "Déjasela a Cronos",
+          busy: "Archivándola…",
+          stampFiled: "ARCHIVADA",
+          receiptBody:
+            "Cronos ya la tiene. Guarda este enlace de confirmación y visítalo antes de que termine cada intervalo — eso es todo lo que hace falta para mantener la carta sellada.",
+          copyLink: "Copiar enlace",
+          copied: "Copiado",
+          copyManual: "Cópialo a mano",
+          openPage: "Abrir página de check-in",
+          errNetwork: "No se pudo contactar a Cronos. Inténtalo de nuevo.",
+          office: "Cronos, una oficina automática de cartas muertas",
+          builtBy: "Hecho por",
+        },
+      };
+
+      let lang = localStorage.getItem("cronos-lang") || "en";
+      const t = (key) => I18N[lang][key] || I18N.en[key] || key;
+
+      let lastLink = null;
+      const result = document.getElementById("result");
+
+      function renderReceipt() {
+        result.innerHTML = `
+          <div class="receipt">
+            <span class="stamp">${t("stampFiled")}</span>
+            <p>${t("receiptBody")}</p>
+            <a class="checkin-link" href="${lastLink}">${lastLink}</a>
+            <div class="receipt-actions">
+              <button type="button" class="copy-btn" data-link="${lastLink}">${t("copyLink")}</button>
+              <a class="open-link" href="${lastLink}">${t("openPage")}</a>
+            </div>
+          </div>`;
+      }
+
+      function applyLang() {
+        document.documentElement.lang = lang;
+        document.title = t("docTitle");
+        document
+          .querySelectorAll("[data-i18n]")
+          .forEach((el) => (el.innerHTML = t(el.dataset.i18n)));
+        document
+          .querySelectorAll("[data-i18n-ph]")
+          .forEach((el) => (el.placeholder = t(el.dataset.i18nPh)));
+        document.getElementById("lang-en").classList.toggle("active", lang === "en");
+        document.getElementById("lang-es").classList.toggle("active", lang === "es");
+        document
+          .getElementById("lang-toggle")
+          .setAttribute("aria-checked", String(lang === "es"));
+        if (lastLink) renderReceipt(); // re-render any dynamic content
+      }
+
+      document.getElementById("lang-toggle").addEventListener("click", () => {
+        lang = lang === "en" ? "es" : "en";
+        localStorage.setItem("cronos-lang", lang);
+        applyLang();
+      });
+
+      applyLang();
+
+      // ---------- API logic (endpoints, methods and payload unchanged) ----------
       document
         .getElementById("create-form")
         .addEventListener("submit", async (e) => {
@@ -489,9 +697,8 @@
           };
 
           const button = e.target.querySelector("button[type=submit]");
-          const result = document.getElementById("result");
           button.disabled = true;
-          button.textContent = "Filing it away…";
+          button.textContent = t("busy");
           result.innerHTML = "";
 
           try {
@@ -507,27 +714,17 @@
                 `checkin.html?id=${data.id}`,
                 window.location.href,
               ).href;
-              result.innerHTML = `
-                <div class="receipt">
-                  <span class="stamp">FILED</span>
-                  <p>Cronos has it now. Save this check-in link and visit it
-                  before each interval ends — that's all it takes to keep
-                  the letter sealed.</p>
-                  <a class="checkin-link" href="${checkinLink}">${checkinLink}</a>
-                  <div class="receipt-actions">
-                    <button type="button" class="copy-btn" data-link="${checkinLink}">Copy link</button>
-                    <a class="open-link" href="${checkinLink}">Open check-in page</a>
-                  </div>
-                </div>`;
+              lastLink = checkinLink;
+              renderReceipt();
               result.scrollIntoView({ behavior: "smooth", block: "center" });
             } else {
               result.innerHTML = `<p class="form-error">${data.error}</p>`;
             }
           } catch (err) {
-            result.innerHTML = `<p class="form-error">Could not reach Cronos. Please try again.</p>`;
+            result.innerHTML = `<p class="form-error">${t("errNetwork")}</p>`;
           } finally {
             button.disabled = false;
-            button.textContent = "Leave it with Cronos";
+            button.textContent = t("submit");
           }
         });
 
@@ -536,10 +733,10 @@
         if (!btn) return;
         try {
           await navigator.clipboard.writeText(btn.dataset.link);
-          btn.textContent = "Copied";
-          setTimeout(() => (btn.textContent = "Copy link"), 1800);
+          btn.textContent = t("copied");
+          setTimeout(() => (btn.textContent = t("copyLink")), 1800);
         } catch (err) {
-          btn.textContent = "Copy manually";
+          btn.textContent = t("copyManual");
         }
       });
     </script>
