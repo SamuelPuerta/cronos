@@ -34,7 +34,7 @@
     <div id="result"></div>
 
     <script>
-      const API_URL = "PASTE_YOUR_API_GATEWAY_URL_HERE";
+      const API_URL = "https://son8ss3zrd.execute-api.us-east-1.amazonaws.com";
 
       document
         .getElementById("create-form")
@@ -57,7 +57,7 @@
           const data = await res.json();
 
           if (res.ok) {
-            const checkinLink = `${window.location.origin}/checkin.html?id=${data.id}`;
+            const checkinLink = new URL(`checkin.html?id=${data.id}`, window.location.href).href;
             document.getElementById("result").innerHTML =
               `<p>Capsule created. Save this check-in link:</p><a href="${checkinLink}">${checkinLink}</a>`;
           } else {

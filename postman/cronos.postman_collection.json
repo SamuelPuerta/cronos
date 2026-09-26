@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:3000",
+      "value": "https://son8ss3zrd.execute-api.us-east-1.amazonaws.com",
       "description": "Base URL of the API: deployed HTTP API URL or http://localhost:3000 for serverless offline"
     },
     {
