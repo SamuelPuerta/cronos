@@ -181,3 +181,28 @@ al ARN exacto de `CapsulesTable` más el sufijo `/index/StatusNextReviewIndex` �
 un detalle importante, porque **los índices tienen su propio ARN y las consultas
 al GSI (`search`, `reviewExpirations`) fallarían con AccessDenied si solo se
 autorizara el ARN de la tabla**.
+
+## 5. Limitaciones conocidas y trabajo futuro
+
+### El campo `message` se almacena en texto plano
+
+Actualmente el contenido de cada cápsula se guarda en DynamoDB **tal cual llega
+en la petición**, sin cifrado a nivel de aplicación. Las únicas protecciones
+sobre ese dato son las que AWS aplica de forma transparente: el **cifrado en
+reposo** que DynamoDB realiza por defecto sobre todas las tablas (AES-256 con
+llaves administradas por AWS, no desactivable) y el cifrado en tránsito vía
+**TLS** (HTTPS en API Gateway). Esto significa que el mensaje está protegido
+contra acceso físico a los discos de AWS, pero cualquier identidad con permisos
+IAM de lectura sobre la tabla (o quien posea el link de check-in, cuyo `GET`
+devuelve el ítem completo) puede leer su contenido.
+
+La mejora natural es el **cifrado de campo con AWS KMS**: cifrar el atributo
+`message` con una CMK antes de escribir el ítem (`kms:Encrypt` /
+`GenerateDataKey` en `create` y `update`) y descifrarlo (`kms:Decrypt`) solo en
+los dos puntos donde se necesita en claro: al leerlo para el dueño y en
+`reviewExpirations` justo antes de construir el correo de SES. Con eso, un
+`Scan` directo sobre la tabla —incluso con credenciales válidas de DynamoDB—
+mostraría únicamente ciphertext, y el despliegue seguiría siendo 100%
+serverless. Queda como trabajo futuro junto a otras mejoras candidatas:
+rotación/revocación de links de check-in y expiración de cápsulas `DELIVERED`
+con TTL de DynamoDB.

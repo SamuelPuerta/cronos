@@ -13,10 +13,20 @@ vía Amazon SES.
 Proyecto de laboratorio — Cloud Computing (Serverless Framework + AWS Lambda +
 API Gateway + DynamoDB).
 
+## Demo en línea
+
+Puedes crear cápsulas directamente desde el frontend desplegado en S3 (Static
+Website Hosting):
+
+**https://cronos-frontend.s3.us-east-1.amazonaws.com/index.html**
+
 ## Arquitectura
 
-El sistema está compuesto por:
+**Toda la arquitectura está construida sobre servicios de AWS.** El sistema está
+compuesto por:
 
+- **Amazon S3** que aloja el frontend estático (`index.html` + `checkin.html`)
+  con Static Website Hosting.
 - **API Gateway (HTTP API)** que expone 7 endpoints REST.
 - **8 funciones Lambda** (una por operación, más la automatización programada).
 - **DynamoDB** (`CapsulesTable`) como única base de datos, con el GSI
